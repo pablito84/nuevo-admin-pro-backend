@@ -8,11 +8,28 @@ const { generarJwt } = require('../helpers/jwt');
 
 const getUsuarios = async( req, res ) =>{
 
-    const usuarios = await Usuario.find({} , 'nombre email password google');
+   const desde = Number(req.query.desde) || 0 ;
+
+   const [ usuarios , total] = await Promise.all([
+         Usuario.find({} , 'nombre email password google img')
+         .skip( desde )
+         .limit( 5 ),
+         
+         Usuario.countDocuments()
+   ]);
+   /// Skip y limit es para la paginacion:
+ /*    const usuarios = await Usuario.find({} , 'nombre email password google')
+                                  .skip( desde )
+                                  .limit( 5 )
+
+    const total = await Usuario.count(); */
+
+
     res.json({
        ok: true,
        usuarios,
-       uid: req.uid 
+       uid: req.uid,
+       total 
     });
 
   }
